@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm,v 1.5 2002/06/19 03:22:44 rcaputo Exp $
+# $Id: JobQueue.pm,v 1.8 2002/12/10 04:47:53 rcaputo Exp $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.52';
+$VERSION = '0.53';
 
 use Carp qw (croak);
 
@@ -46,7 +46,6 @@ sub spawn {
   my %states  =
     ( _child  => \&poco_jobqueue_both_child,
       stop    => \&poco_jobqueue_both_stop,
-      _signal => sub {0},
       _stop   => sub {},
     );
 
@@ -565,9 +564,11 @@ This documentation is pretty bad.
 
 =head1 AUTHOR & COPYRIGHTS
 
-POE::Component::JobQueue is Copyright 1999-2000 by Rocco Caputo.  All
+POE::Component::JobQueue is Copyright 1999-2002 by Rocco Caputo.  All
 rights are reserved.  POE::Component::JobQueue is free software; you
 may redistribute it and/or modify it under the same terms as Perl
 itself.
+
+Rocco may be contacted by e-mail via rcaputo@cpan.org.
 
 =cut
