@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm,v 1.8 2002/12/10 04:47:53 rcaputo Exp $
+# $Id: JobQueue.pm,v 1.10 2004/05/19 16:13:42 rcaputo Exp $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.53';
+$VERSION = '0.54';
 
 use Carp qw (croak);
 
@@ -63,7 +63,7 @@ sub spawn {
     $ack_alias = undef unless defined $ack_alias and length $ack_alias;
 
     my $ack_state = delete $active->{AckState};
-    $ack_state = undef unless defined $ack_alias and length $ack_alias;
+    $ack_state = undef unless defined $ack_state and length $ack_state;
 
     croak "$type must have neither or both AckAlias and AckState"
       if defined($ack_alias) xor defined($ack_state);
@@ -138,6 +138,7 @@ sub poco_jobqueue_active_start {
   # fake an initial poll to get things started.
   $heap->{worker_count}  = 0;
   $heap->{pending_polls} = 0;
+  $heap->{latest_worker} = 0;
 
   # Register an alias.
   $kernel->alias_set($alias);
@@ -193,7 +194,7 @@ sub poco_jobqueue_both_child {
           $heap->{worker_limit}, ")"
         ) if $heap->{worker_count} > $heap->{worker_limit};
     $heap->{worker_count}--;
-    $kernel->yield('dequeue');
+    $kernel->yield('dequeue') unless $heap->{latest_worker};
   }
 }
 
@@ -230,10 +231,11 @@ sub poco_jobqueue_active_dequeue {
     # If the worker count hasn't changed, then we've run out of jobs.
     # Begin polling, if applicable, and exit the spawn loop.
     if ($heap->{worker_count} == $previous_worker_count) {
-      if (defined $heap->{polling_interval} and !$heap->{pending_polls}) {
+      if (defined $heap->{poll_interval} and !$heap->{pending_polls}) {
         $heap->{pending_polls}++;
-        $kernel->delay( dequeue => $heap->{polling_interval} => TIMED );
+        $kernel->delay( dequeue => $heap->{poll_interval} => TIMED );
       }
+      $heap->{latest_worker}++ unless defined $heap->{poll_interval};
       last;
     }
   }

@@ -1,10 +1,9 @@
 #!/usr/bin/perl -w
-# $Id: 01_queues.t,v 1.6 2002/10/21 02:50:52 rcaputo Exp $
+# $Id: 01_queues.t,v 1.8 2003/11/29 23:18:56 rcaputo Exp $
 
 use strict;
 
-sub POE::Kernel::ASSERT_DEFAULT () { 1 };
-sub POE::Session::ASSERT_STATES () { 0 };
+sub POE::Kernel::ASSERT_DEFAULT () { 1 }
 use POE;
 use POE::Component::JobQueue;
 
@@ -55,10 +54,12 @@ sub worker_start {
   }
 }
 
-sub worker_stop {
+sub worker_done {
   my $heap = $_[HEAP];
+
   DEBUG and
     warn "$heap->{aorp} test $heap->{test} finished ($heap->{task})\n";
+
   push @tests_done, $heap->{test};
   if ($heap->{aorp} eq 'active') {
     $active_simultaneous--;
@@ -67,7 +68,7 @@ sub worker_stop {
     $passive_simultaneous--;
   }
 
-  my $postback = $heap->{postback};
+  my $postback = delete $heap->{postback};
   if (ref $postback eq 'ARRAY') {
     my $session = $_[KERNEL]->alias_resolve($postback->[0]);
     if (defined $session) {
@@ -78,7 +79,8 @@ sub worker_stop {
     }
   }
 
-  $postback->( $heap->{test}, $heap->{task} );
+  # Causes some evil recursion somewhere. :(
+  # $postback->( $heap->{test}, $heap->{task} );
 }
 
 #------------------------------------------------------------------------------
@@ -89,10 +91,8 @@ sub spawn_worker {
   POE::Session->create
     ( inline_states =>
       { _start => \&worker_start,
-        _stop  => \&worker_stop,
-
-        # quiets ASSERT_DEFAULT
-        done    => sub {},
+        done   => \&worker_done,
+        _stop => sub {},
       },
       args => [ $outer_postback, $outer_test, $outer_task, $active_or_passive ]
     );

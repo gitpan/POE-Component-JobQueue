@@ -5,3 +5,4 @@ MANIFEST
 Makefile.PL
 README
 t/01_queues.t
+META.yml                                 Module meta-data (added by MakeMaker)

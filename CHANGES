@@ -1,41 +1,19 @@
 =========================
-2002-12-10 04:47:53 v0_53
+2004-05-19 16:13:42 v0_54
 =========================
 
-  2002-12-10 04:47:53 by rcaputo; JobQueue.pm 1.8
+  2004-05-19 16:13:42 by rcaputo; JobQueue.pm 1.10
 
-    Bump version to 0.53 for release. 
+    Zach Thompson reported the hash keys problem that was previously
+    patched, reminding me that I hadn't actually released the fix to the
+    world. Here I am bumping the version number so I can release it to
+    the CPAN. 
 
-  2002-10-21 02:50:52 by rcaputo; t/01_queues.t 1.6
+  2003-11-29 23:18:56 by rcaputo; JobQueue.pm 1.9; t/01_queues.t 1.8
 
-    Turn off ASSERT_STATES to stop warnings for missing _signal handlers
-    in 0.23 and before. 
-
-  2002-10-21 00:43:18 by rcaputo; JobQueue.pm 1.7; t/01_queues.t 1.5
-
-    Fix _signal warnings before POE 0.24 is released. 
-
-  2002-09-10 03:42:50 by rcaputo; Makefile.PL 1.3
-
-    Fix the cvs-log.perl use. D'oh! Test BEFORE committing! 
-
-  2002-09-10 03:40:54 by rcaputo; Makefile.PL 1.2
-
-    Update contact e-mail, and use cvs-log.perl to auto-generate CHANGES
-    from the CVS log. 
-
-  2002-09-10 03:40:27 by rcaputo; JobQueue.pm 1.6
-
-    Update Copyright years and add contact e-mail address. 
-
-  2002-06-19 03:23:20 by rcaputo; t/01_queues.t 1.4
-
-    Remove an unnecessary C<use lib> statement that swissphil said was
-    causing trouble on his NFS system. 
-
-  2002-06-19 03:22:44 by rcaputo; JobQueue.pm 1.5
-
-    Minor debugging information changes. 
+    Applied neyuki's patch to correct some typos in hash keys and
+    parameter names. This also corrects the worker respond logic in
+    active queues. 
 
 =============================
 Beginning of Recorded History
