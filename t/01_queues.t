@@ -1,9 +1,8 @@
 #!/usr/bin/perl -w
-# $Id: 01_queues.t,v 1.1 2000/09/04 20:19:58 rcaputo Exp $
+# $Id: 01_queues.t,v 1.4 2002/06/19 03:23:20 rcaputo Exp $
 
 use strict;
 
-use lib '/home/troc/perl/poe';
 sub POE::Kernel::ASSERT_DEFAULT () { 1 };
 use POE;
 use POE::Component::JobQueue;
@@ -90,6 +89,10 @@ sub spawn_worker {
     ( inline_states =>
       { _start => \&worker_start,
         _stop  => \&worker_stop,
+
+        # quiets ASSERT_DEFAULT
+        done    => sub {},
+        _signal => sub {0},
       },
       args => [ $outer_postback, $outer_test, $outer_task, $active_or_passive ]
     );
@@ -122,6 +125,11 @@ POE::Session->create
     { _start      => \&passive_respondee_start,
       flood_queue => \&passive_respondee_flood_queue,
       response    => \&passive_respondee_response,
+
+      # quiets ASSERT_DEFAULT
+      _signal     => sub {0},
+      _stop       => sub {},
+      dummy       => sub {},
     }
   );
 
@@ -143,6 +151,10 @@ POE::Session->create
   ( inline_states =>
     { _start   => \&active_respondee_start,
       response => \&active_respondee_response,
+
+      # quiets ASSERT_DEFAULT
+      _stop    => sub {},
+      _signal  => sub {0},
     }
   );
 

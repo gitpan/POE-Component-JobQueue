@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm,v 1.1 2000/09/04 20:19:57 rcaputo Exp $
+# $Id: JobQueue.pm,v 1.5 2002/06/19 03:22:44 rcaputo Exp $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,13 +6,13 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 use Carp qw (croak);
 
 use POE::Session;
 
-sub DEBUG () { 1 };
+sub DEBUG () { 0 };
 
 # Spawn a new PoCo::JobQueue session.  This basically is a
 # constructor, but it isn't named "new" because it doesn't create a
@@ -46,6 +46,8 @@ sub spawn {
   my %states  =
     ( _child  => \&poco_jobqueue_both_child,
       stop    => \&poco_jobqueue_both_stop,
+      _signal => sub {0},
+      _stop   => sub {},
     );
 
   ### Modal parameters and states go here.
@@ -98,7 +100,7 @@ sub spawn {
   # Spawn whichever queue we've built.
   POE::Session->create
     ( inline_states => \%states,
-      args          => \@args
+      args          => \@args,
     );
 
   undef;
@@ -179,19 +181,19 @@ sub poco_jobqueue_both_child {
   # A worker has begun its job.  Count it so we know how many exist.
 
   if ($operation eq 'gain' or $operation eq 'create') {
+    DEBUG and warn "JQ: job queue $heap->{alias} got a new worker";
     $heap->{worker_count}++;
   }
 
-  # A worker has finished.  Decrement our worker count; if there is a
-  # pending job in the queue, then begin doing it.
+  # A worker has finished.  Decrement our worker count, and try to
+  # start another worker to take its place.
 
   else {
+    DEBUG and warn "JQ: job queue $heap->{alias} lost a worker";
     warn( "worker count ($heap->{worker_count}) exceeded the limit (",
           $heap->{worker_limit}, ")"
         ) if $heap->{worker_count} > $heap->{worker_limit};
     $heap->{worker_count}--;
-
-    # Bump up the pending polls count in case this is an active queue.
     $kernel->yield('dequeue');
   }
 }
@@ -250,9 +252,15 @@ sub poco_jobqueue_passive_dequeue {
     my $next_job = shift @{ $heap->{job_queue} };
     last unless defined $next_job;
 
-    # Spawn a worker.
+    DEBUG and
+      warn "JQ: job queue $heap->{alias} is starting a new worker";
+
+    # Start a new session with the job.
     $heap->{worker_ref}->( @$next_job );
   }
+
+  # Avoid accidentally returning something.
+  undef;
 }
 
 # Enqueue a job in a passive queue.
@@ -261,18 +269,19 @@ sub poco_jobqueue_passive_enqueue {
   my ($kernel, $sender, $heap, $return_state, @job) =
     @_[KERNEL, SENDER, HEAP, ARG0..$#_];
 
+  DEBUG and warn "JQ: job queue $heap->{alias} enqueuing a new job";
+
   my $postback = $sender->postback( $return_state, @job );
 
-  # Place the job in the queue.  This gives us a chance to prioritize
-  # things before the dequeue events have a chance to come around.
-  # Scan the current job queue until the prioritizer returns >= 0.
+  # Add the job to the queue.  Use the prioritizer to find the right
+  # place to put it.
 
   my $queue_index = @{ $heap->{job_queue} };
   while ($queue_index--) {
-    last unless
-      $heap->{prioritizer}->( \@job,
-                              $heap->{job_queue}->[$queue_index]
-                            ) < 0;
+    last if
+      $heap->{prioritizer}->( $heap->{job_queue}->[$queue_index],
+                              \@job,
+                            ) >= 0;
   }
 
   # Place the new job after the index we found.

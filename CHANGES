@@ -1,4 +1,4 @@
-$Id: CHANGES,v 1.1 2000/09/04 20:19:57 rcaputo Exp $
+$Id: CHANGES,v 1.4 2001/11/30 03:41:12 rcaputo Exp $
 
 ============
 Things to do
@@ -15,6 +15,15 @@ marked with "(???)" are just information.
 
 Note to self: Don't forget to tag the version after a new distribution
 is released.  For example: `cvs tag -Rc v1_00 .'
+
+---------------
+0.52 2002.08.23
+---------------
+
+Clean up some test warnings that were introduced with ASSERT_STATES.
+
+Fix queue prioritization when adding new jobs.  This affects even
+programs that don't specify prioritizers.
 
 ---------------
 0.51 2001.05.29
