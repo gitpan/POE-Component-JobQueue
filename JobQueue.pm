@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm,v 1.10 2004/05/19 16:13:42 rcaputo Exp $
+# $Id: JobQueue.pm 23 2006-08-09 13:23:57Z rcaputo $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.54';
+$VERSION = '0.55';
 
 use Carp qw (croak);
 
@@ -194,8 +194,24 @@ sub poco_jobqueue_both_child {
           $heap->{worker_limit}, ")"
         ) if $heap->{worker_count} > $heap->{worker_limit};
     $heap->{worker_count}--;
-    $kernel->yield('dequeue') unless $heap->{latest_worker};
+    $kernel->yield('dequeue') unless (
+      $heap->{latest_worker} or $heap->{stopped}
+    );
   }
+}
+
+# Remove the alias, stop active polling and delete outstanding job queue
+
+sub poco_jobqueue_both_stop {
+  my ($kernel, $heap) = @_[KERNEL, HEAP];
+
+  $kernel->alias_remove($heap->{alias});
+  $kernel->alarm_remove_all();
+
+  delete $heap->{pollinterval} if ($heap->{pollinterval});
+  delete $heap->{job_queue} if ($heap->{job_queue});
+
+  $heap->{stopped} = 1;
 }
 
 # Attempt to fill empty worker slots.
@@ -222,7 +238,10 @@ sub poco_jobqueue_active_dequeue {
   }
 
   # Attempt to fill the empty worker slots.
-  while ($heap->{worker_count} < $heap->{worker_limit}) {
+  while (
+    not $heap->{stopped}
+    and $heap->{worker_count} < $heap->{worker_limit}
+  ) {
 
     # Call the worker to fetch a new job and spawn a session.
     my $previous_worker_count = $heap->{worker_count};
@@ -247,7 +266,10 @@ sub poco_jobqueue_passive_dequeue {
   my ($kernel, $heap) = @_[KERNEL, HEAP];
 
   # Attempt to fill the empty worker slots.
-  while ($heap->{worker_count} < $heap->{worker_limit}) {
+  while (
+    not $heap->{stopped}
+    and $heap->{worker_count} < $heap->{worker_limit}
+  ) {
 
     # Try to fetch another job from the queue.
     my $next_job = shift @{ $heap->{job_queue} };
@@ -269,6 +291,14 @@ sub poco_jobqueue_passive_dequeue {
 sub poco_jobqueue_passive_enqueue {
   my ($kernel, $sender, $heap, $return_state, @job) =
     @_[KERNEL, SENDER, HEAP, ARG0..$#_];
+
+  if ($heap->{stopped}) {
+    DEBUG and warn(
+      "JQ: $heap->{alias} can not enqueue new jobs after 'stop'\n"
+    );
+
+    return;
+  }
 
   DEBUG and warn "JQ: job queue $heap->{alias} enqueuing a new job";
 
@@ -372,6 +402,9 @@ POE::Component::JobQueue - a component to manage queues and worker pools
     print "original job parameters: (@original_job_params)\n";
     print "results of finished job: (@job_response)\n";
   }
+
+  # Stop a running queue
+  $kernel->call( 'active' => 'stop' );
 
 =head1 DESCRIPTION
 
@@ -551,6 +584,12 @@ postback_handler> in the SYNOPSIS for an example results handler.
 Active JobQueue components act as event generators.  They don't
 receive jobs from the outside; instead, they poll for them and post
 acknowledgements as they're completed.
+
+Running queues can be stopped by posting a "stop" state to the 
+component. Any currently running workers will be allowed to 
+complete, but no new workers will be started.
+
+  $kernel->call( 'queue' => 'stop' ); # Stop the running queue
 
 =head1 SEE ALSO
 
