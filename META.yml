@@ -1,13 +1,14 @@
 --- #YAML:1.0
 name:                POE-Component-JobQueue
-version:             0.55
-abstract:            Handle large numbers of tasks with finite numbers of workers.
-license:             unknown
-generated_by:        ExtUtils::MakeMaker version 6.30_01
-author:              Rocco Caputo <rcaputo@cpan.org>
+version:             0.56
+abstract:            POE component for processing large numbers of tasks with finite numbers of workers.
+license:             perl
+author:              
+    - Rocco Caputo <rcaputo@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
 distribution_type:   module
 requires:     
     POE:                           0.31
 meta-spec:
-    url: <http://module-build.sourceforge.net/META-spec-new.html>;
-    version: 1.1
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

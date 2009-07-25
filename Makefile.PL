@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: Makefile.PL 22 2005-06-21 18:50:16Z rcaputo $
+# $Id: Makefile.PL 26 2009-07-25 06:44:35Z rcaputo $
 
 use ExtUtils::MakeMaker;
 
@@ -9,11 +9,13 @@ open(CHANGES, ">>CHANGES") and close CHANGES;
 WriteMakefile(
 	NAME          => 'POE::Component::JobQueue',
 	AUTHOR        => 'Rocco Caputo <rcaputo@cpan.org>',
+	LICENSE       => 'perl',
 	ABSTRACT      => (
-		'Handle large numbers of tasks with finite numbers of workers.'
+		'POE component for processing large numbers of tasks ' .
+		'with finite numbers of workers.'
 	),
+	LICENSE       => 'perl',
 	VERSION_FROM  => 'JobQueue.pm',
-
 	PM            => { 'JobQueue.pm' => '$(INST_LIBDIR)/JobQueue.pm' },
 	PREREQ_PM     => {
 		POE         => 0.31,

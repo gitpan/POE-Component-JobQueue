@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm 23 2006-08-09 13:23:57Z rcaputo $
+# $Id: JobQueue.pm 26 2009-07-25 06:44:35Z rcaputo $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.55';
+$VERSION = '0.56';
 
 use Carp qw (croak);
 
@@ -302,7 +302,10 @@ sub poco_jobqueue_passive_enqueue {
 
   DEBUG and warn "JQ: job queue $heap->{alias} enqueuing a new job";
 
-  my $postback = $sender->postback( $return_state, @job );
+  my $postback;
+  if (defined $return_state) {
+    $postback = $sender->postback( $return_state, @job );
+  }
 
   # Add the job to the queue.  Use the prioritizer to find the right
   # place to put it.
@@ -400,7 +403,7 @@ POE::Component::JobQueue - a component to manage queues and worker pools
     my @job_results         = @{$response_packet}; # passed to the postback
 
     print "original job parameters: (@original_job_params)\n";
-    print "results of finished job: (@job_response)\n";
+    print "results of finished job: (@job_results)\n";
   }
 
   # Stop a running queue
