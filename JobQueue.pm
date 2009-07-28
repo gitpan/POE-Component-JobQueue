@@ -1,4 +1,4 @@
-# $Id: JobQueue.pm 26 2009-07-25 06:44:35Z rcaputo $
+# $Id: JobQueue.pm 29 2009-07-28 06:33:37Z rcaputo $
 # License and documentation are after __END__.
 
 package POE::Component::JobQueue;
@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.56';
+$VERSION = '0.570';
 
 use Carp qw (croak);
 
@@ -602,17 +602,23 @@ the documentation for its foundation modules to learn more.
 Also see the test program, t/01_queues.t, in the
 POE::Component::JobQueue distribution.
 
-=head1 BUGS
+=head1 BUG TRACKER
 
-This documentation is pretty bad.
+https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=POE-Component-JobQueue
+
+=head1 REPOSITORY
+
+http://thirdlobe.com/svn/poco-jobqueue/
+
+=head1 OTHER RESOURCES
+
+http://search.cpan.org/dist/POE-Component-JobQueue/
 
 =head1 AUTHOR & COPYRIGHTS
 
-POE::Component::JobQueue is Copyright 1999-2002 by Rocco Caputo.  All
+POE::Component::JobQueue is Copyright 1999-2009 by Rocco Caputo.  All
 rights are reserved.  POE::Component::JobQueue is free software; you
 may redistribute it and/or modify it under the same terms as Perl
 itself.
-
-Rocco may be contacted by e-mail via rcaputo@cpan.org.
 
 =cut

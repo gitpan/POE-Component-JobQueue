@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: Makefile.PL 26 2009-07-25 06:44:35Z rcaputo $
+# $Id: Makefile.PL 29 2009-07-28 06:33:37Z rcaputo $
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,13 @@ WriteMakefile(
 	VERSION_FROM  => 'JobQueue.pm',
 	PM            => { 'JobQueue.pm' => '$(INST_LIBDIR)/JobQueue.pm' },
 	PREREQ_PM     => {
-		POE         => 0.31,
+		POE         => 1.007,
+	},
+	META_ADD     => {
+		resources  => {
+			license    => 'http://dev.perl.org/licenses/',
+			repository => 'http://thirdlobe.com/svn/poco-jobqueue/trunk'
+		},
 	},
 	dist          => {
 		COMPRESS    => 'gzip -9f',

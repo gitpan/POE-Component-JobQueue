@@ -1,3 +1,16 @@
+==================================
+2009-07-28T06:34:13.173649Z v0_570
+==================================
+
+  2009-07-28 06:33:37 (r29) by rcaputo; Makefile.PL M; JobQueue.pm M
+
+    Use latest POE, and prepare for a new release.
+
+  2009-07-27 04:43:43 (r28) by rcaputo; Makefile.PL M; JobQueue.pm M
+
+    Add a machine-readable repository. Add BUG TRACKER, REPOSITORY and
+    OTHER RESOURCES sections to the docs. 
+
 =================================
 2009-07-25T06:45:02.718940Z v0_56
 =================================
