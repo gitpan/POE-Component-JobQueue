@@ -6,7 +6,7 @@ package POE::Component::JobQueue;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.570';
+$VERSION = '0.571';
 
 use Carp qw (croak);
 

@@ -1,29 +1,3 @@
-==================================
-2009-07-28T06:34:13.173649Z v0_570
-==================================
-
-  2009-07-28 06:33:37 (r29) by rcaputo; Makefile.PL M; JobQueue.pm M
-
-    Use latest POE, and prepare for a new release.
-
-  2009-07-27 04:43:43 (r28) by rcaputo; Makefile.PL M; JobQueue.pm M
-
-    Add a machine-readable repository. Add BUG TRACKER, REPOSITORY and
-    OTHER RESOURCES sections to the docs. 
-
-=================================
-2009-07-25T06:45:02.718940Z v0_56
-=================================
-
-  2009-07-25 06:44:35 (r26) by rcaputo; Makefile.PL M; JobQueue.pm M
-
-    New release. Add a LICENSE. Resolve rt.cpan.org #45537 by applying
-    Steve Stachurski's documentation patch. 
-
-  2006-11-06 19:23:22 (r25) by rcaputo; Makefile.PL M
-
-    Set a LICENSE. Cheap kwalitee points!
-
 ==============
 End of Excerpt
 ==============
